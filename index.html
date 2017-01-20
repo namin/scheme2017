@@ -49,14 +49,14 @@
         <div class="col-md-8">
           <div class="row">
             <div class="col-md-6">
-              <h3>Important Dates (Tentative)</h3>
+              <h3>Important Dates</h3>
               <dl class="dl-horizontal">
                 <dt>Submission deadline</dt>
-                <dd>May 26th, 2017 (UTC-12)</dd>
+                <dd>May 26th, 2017 <a href="https://en.wikipedia.org/wiki/Anywhere_on_Earth">(AoE)</a></dd>
                 <dt>Author notification</dt>
-                <dd>June 27th, 2017</dd>
+                <dd>June 27th, 2017 <a href="https://en.wikipedia.org/wiki/Anywhere_on_Earth">(AoE)</a></dd>
                 <dt>Camera-ready deadline</dt>
-                <dd>July 28th, 2017 (UTC-12)</dd>
+                <dd>July 28th, 2017 <a href="https://en.wikipedia.org/wiki/Anywhere_on_Earth">(AoE)</a></dd>
                 <dt>Workshop</dt>
                 <dd>September 3rd, 2017</dd>
               </dl>
@@ -80,42 +80,84 @@
       <div class="row">
         <div class="col-md-12">
           <div class="page-header">
-            <h2>Topics</h2>
+            <h2>Introduction</h2>
           </div>
-          <p>Submissions related to Scheme, Racket, Clojure, and
-            functional programming are welcome and encouraged.
-            Topics of interest include but are not limited to:
+          <p>
+            The Scheme and Functional Programming Workshop is
+            a yearly meeting of programming language practitioners who share
+            a sense of aesthetic as embodied by
+            the Algorithmic Language Scheme:
+            universality through minimalism,
+            adequation through self-improvement,
+            flexibility through rigorous design,
+            composability through orthogonal features.
+          </p>
+
+          <div class="page-header">
+            <h2>Call For Papers</h2>
+          </div>
+          <p>We invite high-quality papers about
+            novel research results,
+            lessons learned from practical experience
+            in industrial or educational setting,
+            and even new insights on old ideas.
+            We welcome and encourage submissions that apply to any language
+            that can be considered Scheme:
+            from strict subsets of RnRS to other "Scheme" implementations,
+            to Racket, to Lisp dialects
+            including Clojure, Emacs Lisp, Common Lisp,
+            to functional languages with continuations and/or macros
+            (or extended to have them) such as
+            Dylan, ECMAcript, Hop, Lua, Scala, Rust, etc.
+            The elegance of the paper and the relevance of its topic
+            to the interests of Schemers will matter more than
+            the surface syntax of the examples used.
+            Topics of interest include (but are not limited to):
           </p>
           <ul>
-            <li>Program-development environments, debugging, testing</li>
-            <li>Implementation (interpreters, compilers, tools, benchmarks, etc.)</li>
-            <li>Syntax, macros, hygiene</li>
-            <li>Distributed computing, concurrency, parallelism</li>
-            <li>Probabilistic computing</li>
-            <li>Interoperability with other languages, FFIs</li>
-            <li>Continuations, modules, object systems, types</li>
-            <li>Theory, formal semantics, correctness</li>
-            <li>History, evolution and standardization of Scheme</li>
-            <li>Applications, experience and industrial uses of Scheme</li>
-            <li>Education</li>
-            <li>Scheme pearls (elegant, instructive uses of Scheme)</li>
+            <li><em>Interaction</em>:
+              program-development environments,
+              debugging, testing, refactoring</li>
+            <li><em>Implementation</em>:
+              interpreters, compilers, tools,
+              garbage collectors, benchmarks</li>
+            <li><em>Extension</em>:
+              macros, hygiene,
+              domain-specific languages, reflection,
+              and how such extension affects interaction.</li>
+            <li><em>Expression</em>:
+              control, modularity, ad hoc and parametric polymorphism,
+              types, aspects, ownership models,
+              concurrency, distribution, parallelism,
+              non-determinism, probabilism,
+              and other programming paradigms</li>
+            <li><em>Integration</em>:
+              build tools, deployment,
+              interoperation with other languages and systems</li>
+            <li><em>Formal semantics</em>:
+              Theory, analyses and transformations, partial evaluation</li>
+            <li><em>Human Factors</em>:
+              History, evolution, sociology of Scheme
+              and its standardization</li>
+            <li><em>Education</em>:
+              approaches, experiences, curricula</li>
+            <li><em>Applications</em>:
+              industrial uses of Scheme</li>
+            <li><em>Scheme pearls</em>:
+              elegant, instructive uses of Scheme</li>
           </ul>
-
-          <p><strong>We also welcome submissions related to dynamic or
-              multiparadigmatic languages and programming techniques.</strong>
-          </p>
 
           <div class="page-header">
             <h2>Submission Information</h2>
           </div>
 
-          <p>Please submit papers and demonstration proposals to our
+          <p>Please submit full papers and experience reports to our
             <a href="https://easychair.org/conferences/?conf=scheme17">Submission Page</a>.
           </p>
 
-          <p>Paper submissions must be in
-            <tt>acmart</tt> format, <tt>sigplan</tt> sub-format,
-            no smaller than 9-point type (10-point type preferred).
+          <p><em>[NEW IN 2017!]</em> <b>Paper submissions must use the
+              <tt>acmart</tt> format, <tt>acmlarge</tt> sub-format</b>.
+            They must be in PDF, printable in black and white on US Letter size.
             Microsoft Word and LaTeX templates for this format are available at:
           </p>
 
@@ -123,13 +165,48 @@
              <a href="http://www.sigplan.org/Resources/Author/">http://www.sigplan.org/Resources/Author/</a>
           </p>
 
+          <p>This change is in line with ACM conferences
+            (such as ICFP with which we are colocated)
+            switching from their traditional two-column formats
+            (e.g. <tt>sigplanconf</tt>) to the above.
+            While a two-column format with small fonts
+            is much more practical when printing and reading papers,
+            the single-column format with large fonts
+            is nicer to view on a computer screen,
+            as most <q>papers</q> are read these days.
+          </p>
+
           <p>To encourage authors to submit their best work,
-            we are encouraging shorter papers (around 6 pages, excluding references).
-            This is to allow authors to submit longer, revised versions of their papers
-            to archival conferences or journals.
-            Longer papers (10-12 pages) are also acceptable, if the extra space is needed.
-            There is no maximum length limit on submissions,
-            but good submissions will likely be in the range of 6 to 12 pages.
+            we offer three tracks:
+          </p>
+          <ul>
+            <li>
+              <b>Full Papers</b>, with a limit to 24 pages.
+              Each accepted paper will be presented by its authors
+              in a 40 minute slot including Q&amp;A.
+            </li>
+            <li>
+              <b>Experience Reports</b>, with a limit to 12 pages,
+              Each accepted report will be presented by its authors
+              in a 20 minute slot including Q&amp;A.
+            </li>
+            <li>
+              <b>Lightning talks</b>, with a limit to 192 words.
+              Each accepted lightning talk will be presented by its authors
+              in a 5 minute slot including Q&amp;A.
+            </li>
+          </ul>
+          <p>
+            The size limits above exclude references
+            and any optional appendices.
+            There are no size limits on appendices,
+            but the papers should stand without the need to read them,
+            and reviewers are not required to read them.
+          </p>
+          <p>
+            Authors are encouraged to publish any code associated to their
+            papers under a open source license, so that
+            reviewers may try the code and verify the claims.
           </p>
 
           <p>Proceedings will be printed as a University Technical Report.
