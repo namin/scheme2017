@@ -1,0 +1,45 @@
+
+\section{Introduction}
+%
+A \textit{control-flow analysis} (CFA) of a functional programming language models the
+propagation of data flows and control flows through a target program, across all
+possible executions.
+%
+In static analyses of functional languages generally, a model of where functional values
+(i.e., lambdas, closures) can flow is required to model where control can flow
+from a call site, and vice versa.
+%
+At a call site in Scheme, \texttt{(f x)}, the possible values for \texttt{f} determine
+which lambda bodies can be reached.
+%
+Likewise, the possible callers for the lambda that binds \texttt{f},
+$\texttt{(lambda ($\ldots$ f $\ldots$) $\ldots$)}$, influence the lambdas that
+can flow into \texttt{f}.
+%
+This mutual dependence of data flow and control flow can be handled using an abstract interpretation,
+simultaneously modeling all interdependent language features.
+%
+There are systematic approaches to designing analyses such as these, however the traditional worklist algorithms
+used to implement them in practice are inefficient and have difficulty scaling.
+%
+Even with optimizations such as global-store widening and flat environments, the analysis is in $O(n^3)$ in the
+flow-insensitive case or in $O(n^4)$ in the flow-sensitive case.
+%
+Using more advanced forms of polyvariance or context-sensitivity, the analysis becomes significantly more expensive.
+
+
+In this paper, we describe our ongoing work to encode these analyses as declarative datalog programs and
+implement them as highly parallel relational algebra (RA), on the GPU and across many CPUs.
+%
+Relational algebra operations, derived from Datalog analysis specifications, are computationally intensive and memory-bound in nature.
+%
+GPUs provide massive fine-grained parallelism and great memory bandwidth, potentially making them the ideal
+target for solving these operations. We use Redfox~\cite{Wu:2014:RFE:2581122.2544166}, an open source tool which 
+executes queries expressed in a specialized query language on GPUs. We also modify Redfox, adding
+capabilities to perform fixed-point iterations essential for solving RA operations derived from Datalog.
+%
+We are also pursuing a Message Passing Interface (MPI)-based backend for solving RA operations across many compute nodes on a network. 
+This approach is also particularly promising, given that HPC is increasingly mainstream and supercomputers are getting
+faster cores and lower latency interconnects.
+
+

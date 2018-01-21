@@ -1,0 +1,71 @@
+% Created 2017-05-26 Fri 18:39
+% Intended LaTeX compiler: pdflatex
+\documentclass[acmlarge]{acmart}
+
+
+\acmConference{Scheme and Functional Programming Workshop 2017}{September 03, 2017}{Oxford, UK}
+\acmSubmissionID{}
+\acmDOI{}
+\setcopyright{none}
+\copyrightyear{2017}
+\settopmatter{printacmref=false, printccs=false, printfolios=false}
+\acmVolume{}
+\acmNumber{}
+\acmArticle{2}
+\acmYear{2017}
+\acmMonth{9}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[R]{}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{Joseph Corneli and Raymond Puzio}
+\date{26 May, 2017}
+\title[Talk]{Extending the LISP model: from cons cells to triples, from trees to hypergraphs}
+\hypersetup{
+ pdfauthor={Joseph Corneli and Raymond Puzio},
+ pdftitle={Extending the LISP model: cons cells to triples, trees to hypergraphs},
+ pdfkeywords={arxana, hypertext, inference anchoring},
+ pdfsubject={Organizer for presentation on arxana and math text analysis at Oxford.},
+ pdfcreator={Emacs 25.1.50.2 (Org mode 9.0.5)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+Arxana is a higher-dimensional variant of LISP, based on
+nested semantic networks instead of cons cells.  In contradistinction
+to LISP where the fundamental building block is a cell
+`\verb|(a . b)|', Arxana's fundamental building block is a triple,
+`\verb|(a c b)|'.  Furthermore, in the language of the Semantic Web,
+every triple is `reified'.  Links and their constituent positions can
+contain further structure or be augmented with offset annotations: for
+example, we distinguish between `\verb|((a d e) c b)|' and
+`\verb|(a c b)| \(\oplus_1\) \verb|(a d e)|'.  The first form models
+an assertion about the link `\verb|(a d e)|', and the second models an
+assertion about the atom `\verb|a|' within `\verb|(a c b)|'.  These
+facilities allow us to build, reason about, query, and program with
+hypergraphs rather than trees or networks.  This representation
+strategy is useful for building runnable conceptual models of complex
+and recursive structures.  Modelling informal mathematical discourse is a
+motivating application: this requires a different approach from
+the strictly deductive style of formal mathematics.  Other programming
+languages which support a similar annotative style include Kurzweil's
+\emph{Flare} and Nelson's \emph{ZigZag}.  Our Arxana prototypes are
+implemented in Emacs Lisp.
+\end{document}

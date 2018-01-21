@@ -1,0 +1,11 @@
+
+\section{Future work and Conclusion}
+We have outlined a possible pipeline for extracting parallelism from a control-flow analysis in a principled way and have implemented GPU-based
+and MPI-based transitive closure algorithms to experiment with parallizing this kind of problem. 
+We are also interested in writing PGAS based backends for our RA kernels.
+Partitioned global address space (PGAS) is a commonly used parallel programming model, 
+that follows the ideals of shared memory access but operates in a distributed setting---it assumes a
+global memory address space that is logically partitioned, portions of which are local to each process. 
+The two main implementations of this programming model are chapel~\cite{doi:10.1177/1094342007078442} and UPC++.%~\cite{6877339}. 
+
+

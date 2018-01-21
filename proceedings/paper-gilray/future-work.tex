@@ -1,0 +1,25 @@
+\section{Many-node Inner-joins and Future Work}
+Today's supercomputers boosting of very low latency interconnect networks and highly optimized compute cores
+opens up the possibility of implementing scalable relational algebra kernel with an Message-Passing Interface (MPI) backend.
+MPI is a portable standard library interface for writing parallel programs in a HPC setting. 
+It is used on a variety of computing infrastructure: from small clusters to high-end supercomputers. 
+
+More recently ~\cite{Barthels:2017:DJA:3055540.3055545, Barthels:2015:RIJ:2723372.2750547}, there has been a concerted effort to implement JOIN operations on clusters using an MPI backend. 
+The commonly used radix-hash join and merge-sort join have been re-designed for a parallel computing setting. 
+Both these algorithms involve smart-partitioning of the data so that they can be efficiently distributed 
+to the participating processes and are done so that inter-process communication is minimized. In the both these implementations,
+one-sided communication is used for transferring data betweeen process. With one-sided communication the initiator of a data transfer request can directly access
+parts of the remote memory and has full control where the data will be placed. Read and write operations are executed
+without any involvement of the target machine. This approach of data transfer involves minimal synchronization between particiapting processes and have been shown to scale better that traditional two-sided communication. The implementation of parallel join has shown promising performance numbers, for example 
+Although there is still
+These results are very encouraging and we plan to extend our CFA pipeline to support MPI backend for processing datalog queries.
+
+
+\subsection{Partitioned global address space model}
+Partitioned global address space (PGAS) is also a commonly followed parallel programming model.
+The model follows the ideals behind shared memory but since it operates in a distributed setting,
+it assumes a global memory address space that is logically partitioned portions of which is 
+local to each process. Two of the common implementations of the programming models are chapel~\cite{doi:10.1177/1094342007078442} and UPC++~\cite{6877339}. 
+We are also interested in writing PGAS based backends for our RA kernels, 
+as this approach inherently exploits spatial locality through portions of shared memory space.
+

@@ -1,0 +1,170 @@
+\documentclass[acmlarge]{acmart}
+
+\acmConference{Scheme and Functional Programming Workshop 2017}{September 03, 2017}{Oxford, UK}
+\acmSubmissionID{}
+\acmDOI{}
+\setcopyright{none}
+\copyrightyear{2017}
+\settopmatter{printacmref=false, printccs=false, printfolios=false}
+\acmVolume{}
+\acmNumber{}
+\acmArticle{3}
+\acmYear{2017}
+\acmMonth{9}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[R]{}
+\fancypagestyle{firstfancy}{
+\fancyhead{}
+\fancyhead[R]{Paper\quad\textbullet\quad3}
+\fancyfoot{}
+}
+
+\citestyle{acmauthoryear}
+
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{calc}
+\usepackage{xspace}
+\usepackage{upgreek}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{alltt}
+\usepackage{fancyvrb}
+\usepackage{array}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{mathpartir}
+\usepackage{balance}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{framed}
+\usepackage{colortbl}
+\usepackage{kbordermatrix}
+
+
+%\usepackage{courier}
+\usepackage[ocr-a]{ocr} % Or whatever TT font we like
+%\usepackage[T1]{fontenc}
+%%% Hack to suppress a warning
+%% \renewcommand*\copyright{{%
+%%   \usefont{EU1}{lmr}{m}{n}\textcopyright}}
+
+ 
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+\definecolor{comment}{rgb}{0.59, 0.72, 0.83}
+\definecolor{contract}{rgb}{0.86, 0.64, 0.26}
+\definecolor{errstring}{rgb}{0.73, 0.42, 0.34}
+
+
+%% \acmJournal{}
+%% \acmVolume{9}
+%% \acmNumber{4}
+%% \acmArticle{39}
+%% \acmYear{2010}
+%% \acmMonth{3}
+%% \acmArticleSeq{11}
+
+%\acmBadgeR[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+%\acmBadgeL[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+
+
+% Copyright
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+\setcopyright{none}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+
+% DOI
+\acmDOI{0000001.0000001}
+
+% Paper history
+%% \received{February 2007}
+%% \received{March 2009}
+%% \received[accepted]{June 2009}
+
+
+
+\begin{document}
+\title[Paper: Toward Parallel CFA with Datalog, MPI, and CUDA]{Toward Parallel CFA with Datalog, MPI, and CUDA}
+
+\author{Thomas Gilray}
+\affiliation{%
+  \institution{University of Maryland}
+  \city{College Park}
+  \state{MD}
+  \country{USA}
+}
+\author{Sidharth Kumar}
+\affiliation{%
+  \institution{University of Utah}
+  \city{Salt Lake city}
+  \state{UT}
+  \country{USA}
+}
+
+
+\input{gilray-macros}
+%\techreporttrue
+
+\begin{abstract} 
+%
+  We present our recent experience working to design parallel functional control-flow analysis (CFA)
+  using an encoding in Datalog and underlying relational algebra implemented for SIMD coprocessors and supercomputers.
+  %
+  Control-flow analysis statically models the possible propagations of data and control through
+  a target program, finitely obtaining a bound on reachable expressions and environments and on 
+  possible return and argument values.
+  %
+  We used Souffl\'e, a parallel CPU-based Datalog implementation from Oracle labs, and
+  worked toward a new MPI-based distributed hash join implementation and an extension of the
+  GPU-based relational algebra library RedFox.
+
+  
+  In this paper, we provide introductions to functional flow analysis, Datalog, MPI, and CUDA, explaining the total
+  process we are working on to bring these components together in an analysis pipeline toward the end of scaling
+  functional program analyses by extracting their intrinsic parallelism in a principled manner.
+%
+\end{abstract}
+
+\keywords{Control-flow analysis; CFA; Datalog; CUDA; MPI; Parallelism; Static analysis}
+
+\maketitle 
+\thispagestyle{firstfancy}
+
+\input{sec-intro}
+
+\input{sec-aam}
+
+\input{sec-datalog}
+
+\input{sec-hashjoin}
+
+\input{sec-redfox}
+
+\input{sec-futurework}
+
+\balance
+\bibliographystyle{ACM-Reference-Format} 
+{%\footnotesize
+\bibliography{gilray,local}
+}
+
+%\iftechreport
+  %\input{appendix}
+%\else
+%  \relax
+%\fi
+
+\end{document}
+

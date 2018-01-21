@@ -1,0 +1,54 @@
+\documentclass[acmlarge]{acmart}
+
+%\settopmatter{printacmref=false}
+\settopmatter{}
+
+\acmDOI{}
+
+
+\acmConference{Scheme and Functional Programming Workshop 2017}{September 03, 2017}{Oxford, UK}
+\acmSubmissionID{}
+\acmDOI{}
+\setcopyright{none}
+\copyrightyear{2017}
+\settopmatter{printacmref=false, printccs=false, printfolios=false}
+\acmVolume{}
+\acmNumber{}
+\acmArticle{4}
+\acmYear{2017}
+\acmMonth{9}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[R]{}
+
+\title[Talk]{Gerbil on Gambit, as they say Racket on Chez}
+\author{Dimitris Vyzovitis}
+\email{vyzo@hackzen.org}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+Gerbil is a new opinionated dialect of Scheme designed for Systems
+Programming with a state of the art macro and module system on top of
+the Gambit runtime. Gerbil wants to fill the the needs of seasoned
+Schemers and Common LISP refugees who want to do their systems
+programming with modern macro facilities and without loss of
+performance.
+
+The system implements modularity and language extensibility facilities
+equivalent to Racket's, including the {\tt \#lang} reader.  Gerbil implements
+this with a macro expander, compiler, and standard library sitting on
+top of Gambit.  As such, it brings these facilities for the first time
+to a highly performant Ahead of Time natively compiled environment.
+
+The relationship between Gerbil and Gambit is symbiotic: Gerbil
+provides the top-half and Gambit the bottom-half ot the system,
+similar to how Racket will run on Chez in the not so distant future.
+
+\vspace{1cm}
+Source code: \url{https://github.com/vyzo/gerbil}
+
+\end{document}

@@ -1,0 +1,119 @@
+
+
+\section{Datalog-based Flow Analysis}
+%
+In this section, we will give an overview of Datalog as a declarative logic-programming
+language, show how it may be executed using a bottom-up fixed-point algorithm, and discuss
+our encoding of abstract semantics from the previous section.
+%
+
+
+
+\subsection{Datalog}
+%
+A datalog program consists of a set of relations, along with the \textit{rules}
+pertaining to them.
+%
+A relation encodes a set of tuples known as \textit{facts}.
+%
+For example, if we have a relation $\var{Parent}$, the fact $\var{Parent}(p,c)$
+may assert that $p$ is a parent of $c$.
+%
+A rule then takes the form $a_0\ :\!-\ a_1, \ldots, a_j$ where a comma denotes conjunction and
+each atom $a_i$ is of the form $r(x, \ldots)$, where $r$ is a relation and each $x$ is a variable.
+%
+In Datalog the turnstile means ``is implied by''; this is because the rules are formally an implication
+form of a Horn clause.
+%
+Horn clauses are disjunctions where all but one of the atoms are negated: $a_0 \vee \neg a_1 \vee \ldots \vee \neg a_j$.
+%
+This is the same as $a_0 \vee \neg (a_1 \wedge \ldots \wedge a_j)$ by De Morgan's laws, which is the same as an implication:
+$a_0 \impliedby a_1 \wedge \ldots \wedge a_j$.
+%
+%The satisfiability (SAT) problem for conjunctions of horn clauses (or datalog rules) is complete for PTIME \cite{}. 
+%
+For example, a rule for computing grandparents can be specified:
+%
+\[
+  \var{GrandParent}(gp, c)\ :\!-\ Parent(gp, p), Parent(p, c).
+\]
+
+
+
+
+
+\subsection{Datalog solvers}
+%
+A number of strategies exist for executing a datalog program---that is, finding a sound least-fixed-point
+that contains all the input facts and obeys every rule.
+%
+Unlike solvers for Prolog and other logic programming systems, bottom-up approaches have tended to prevail
+\cite{ullman:1989:bottomup} although this can depend on extensions to the language and its use.
+%
+Bottom-up solving begins with the set of facts provided as input, and iterates a monotonic function
+encoding the set of rules until a least-fixed-point is reached.
+%
+The data structure for relations and the operation of these increasing iterations varies by approach.
+
+
+The datalog solver \textit{bddbddb} uses binary decision diagrams (BDDs) to encode relations and supports
+efficient relational algebra (RA) over these structures \cite{whaley:2005:bddbddb}.
+%
+BDDs are decision trees that encode arbitrary relations by viewing each bit in the input as a binary decision.
+%
+They have the potential to be a compact and efficient representation of a relation, but have a worst-case
+exponential space complexity and are highly sensitive to variable ordering (in what order are bits of input
+branched on).
+
+
+The datalog solver Souffl\'e uses the semi-na\"ive bottom up algorithm with partial-evaluation-based optimization
+\cite{scholz:2016:souffle}.
+%
+A relational algebra machine (RAM) executes the program in bottom-up fashion by using efficient underlying data
+structures for relations (such as prefix trees) and directly selects and propagates tuples in a series of nested loops.
+%
+This RAM then has a partial-evaluation applied to it that optimizes the interpretation for the specific set of
+datalog rules.
+%
+The tool accepts a datalog program as input, performs this partial evaluation and writes a C++ program that
+parallelizes the outside loops of each RA operation using pthreads.
+
+
+
+\subsection{Encoding CFA}
+%
+Various program analysis have been implemented using Datalog. Both bddbddb and Souffl\'e presented
+program analyses in their experiments. Another prominent example is the DOOP framework for Java
+\cite{smaragdakis:2011:pickyourcontexts}, used to demonstrate a generalization of object-sensitive flow analysis.
+
+
+To encode a control-flow analysis as a Datalog problem, we first represent the abstract syntax tree (AST) as
+a set of relations where each expression and variable in the program has been enumerated.
+%
+In the souffl\'e syntax, the encoding for Lambda expressions, conditional expressions, and Variable references is as follows:
+%
+\begin{Verbatim}
+  .decl SyntaxLambdaExp(e:Exp, x:Var, ebody:Exp) input
+  .decl SyntaxIfExp(e:Exp, x:Var, e0:Exp, e1:Exp) input
+  .decl SyntaxVarExp(e:Exp, x:Var) input
+\end{Verbatim}
+%
+A tuple $(e_0,x,\var{e_1})$ in the \texttt{SyntaxLambdaExp} relation indicates that the expression $e_0$ is a lambda
+with the formal parameter $x$ and the expression body $e_1$. A tuple $(e_0,x,e_1,e_2)$ in the \texttt{SyntaxIfExp} relation
+indicates that the expression $e_0$ is a conditional branching on the variable $x$ with the true branch $e_1$ and false
+branch $e_2$. A tuple $(e,x)$ in the \texttt{SyntaxVarExp} relation indicates that the expression $e$ is a variable reference
+returning the value of variable $x$.
+
+
+We then encode the constraints of our analysis directly as rules in datalog, such as:
+%
+\begin{Verbatim}
+StoreEdge(x,y) :-
+  SyntaxVarExp(e,x),
+  ReachableExp(e,kaddr),
+  KStore(kaddr,y,ebody,kaddr0).
+\end{Verbatim}
+%
+This rule adds a flow from $x$ to $y$ when a reachable expression $e$ is returning the value at $x$ and
+its continuation binds the variable $y$.
+

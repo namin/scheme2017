@@ -1,0 +1,338 @@
+
+
+\section{Control-flow Analysis} 
+\label{sec:aam}
+%
+This section introduces control-flow analysis by instantiating it for the continuation-passing-style (CPS)
+$\lambda$-calculus. 
+%
+We follow the abstracting abstract machines (AAM) methodology, a systematic process for developing a static analysis
+(an approximating semantics) from a precise operational semantics of an abstract machine.
+
+
+Static analysis by abstract interpretation proves properties of a program by running code through an interpreter powered by an 
+\textit{abstract semantics} that approximates the behavior of an exact \textit{concrete semantics}.
+%
+This process is a general method for analyzing programs and serves applications such as program verification, malware/vulnerability detection, and
+compiler optimization, among others 
+\cite{cousot:1976:staticdetermination,cousot:1977:unifiedlatticemodel,cousot:1979:systematicdesign,midtgaard:2012:cfa}.
+%
+Van Horn and Might's approach of \textit{abstracting abstract machines} (AAM) uses abstract interpretation of abstract machines for \textit{control-flow analysis} (CFA) of functional (higher-order) 
+programming languages \cite{johnson:2013:oaam,might:2010:aam,might:2010:free}.
+%
+The AAM methodology is flexible and allows a high degree of control over how program states are represented.
+%
+AAM provides a general method for automatically abstracting an arbitrary small-step 
+abstract-machine semantics to obtain an approximation in a variety of styles.
+%
+Importantly, one such style aims to focus all unboundedness in a semantics on the machine's address-space.
+%
+This makes the strategy used for the allocation of addresses crucial to the tradeoff struck between precision and complexity~\cite{gilray:2016:allocation}, and results in a highly flexible and tunable analysis infrastructure.
+%
+More broadly, the approach has been used to instantiate both traditional finite flow analyses and heavy-weight program verification \cite{nguyen:2014:SCV}. 
+
+
+\subsection{A Concrete Operational Semantics}
+\label{sec:aam:concrete}
+%
+This section reviews the process of producing a formal operational semantics for a simple language \cite{plotkin:1981:structural},
+specifically, the untyped $\lambda$-calculus in \textit{continuation-passing style} (CPS).
+%
+CPS constrains call sites to tail position so that functions may never return; instead, callers explicitly pass a continuation forward to be invoked on the return value \cite{plotkin:1975:cps}.
+%
+This makes our semantics tail recursive (small-step) and easier to abstract while entirely eliding the challenges of manually managing a stack and its abstraction, a process previously discussed in the context of AAM \cite{might:2010:aam, johnson:2014:aac}.
+%
+Using an AAM that explicitly models the stack in a precise manner, while allowing for adjustable allocation, has also been recently addressed \cite{gilray:2016:p4f}.
+
+
+The grammar structurally distinguishes between call-sites $call$ and atomic-expressions $ae$:
+%
+\begin{align*}
+	\var{call} \in \syn{Call} ::=&\ \ttlp \var{ae}\ \var{ae}\ \ldots \ttrp\ \vert\ \ttlp \mathtt{halt} \ttrp  
+  \\
+	\var{lam} \in \syn{Lam} ::=&\ \ttlp \lambda\ \ttlp x\ \ldots \ttrp\ \var{call} \ttrp 
+  \\
+	\var{ae} \in \syn{AE} ::=&\ \var{lam}\ \vert\ x  
+  \\
+	x \in \syn{Var} \textit{\ is}&\textit{\ a set of program variables}
+\end{align*}
+%
+Instead of specifically affixing each expression with a unique label, we assume two identical expressions occurring separately in a program are not equal.
+%
+While a direct-style language with a variety of continuations (e.g., argument continuations, \texttt{let}-continuations, etc.), 
+or extensions such as recursive-binding forms, conditionals, mutation, or primitive operations, 
+would add complexity to any semantics, they do not affect the concepts we are exploring and so are left out.
+
+
+We define the evaluation of programs in this language using a relation ($\cTo$), over states of an abstract-machine, which determines how the 
+machine transitions from one state to another.
+%
+States $(\varsigma)$ range over control expression (a call site), binding environment, and value store components:
+%
+\begin{align*}
+  \varsigma \in \Sigma \defas&\ \syn{Call} \times \var{Env} \times \var{Store} 
+  \\
+  \rho \in \var{Env} \defas&\ \syn{Var} \rightharpoonup \var{Addr}  
+  \\
+  \sigma \in \var{Store} \defas&\ \var{Addr} \rightharpoonup \var{Value}  
+  \\
+  a \in \var{Addr} \defas&\ \syn{Var} \times \mathbb{N} 
+  \\
+  v \in \var{Value} \defas&\ \var{Clo}
+  \\
+  \var{clo} \in \var{Clo} \defas&\ \syn{Lam} \times \var{Env} 
+\end{align*}
+%
+Environments $(\rho)$ map variables in scope to an address for the visible binding.
+%
+Value stores $(\sigma)$ map these addresses to values (in this case, closures); these may be thought of as a model of the heap.
+%
+Both these functions are partial and accumulate points as execution progresses.
+
+
+Evaluation of atomic expressions is handled by an auxiliary function $(\mathcal{A})$ which produces a value $(\var{clo})$
+for an atomic expression in the context of a state $(\varsigma)$.
+%
+This is done by a lookup in the environment and store for variable references $(x)$, and by closure creation for $\lambda$-abstractions $(\var{lam})$.
+%
+In a language containing syntactic literals, these would be translated into equivalent semantic values here.
+%
+\begin{align*}
+  \mathcal{A} : \mathsf{AE} \times \Sigma \rightharpoonup&\ \var{Value} 
+  \\
+  \mathcal{A}(x,\ (\var{call},\ \rho,\ \sigma)) \defas&\ \sigma(\rho(x)) 
+  \\
+  \mathcal{A}(\var{lam},\ (\var{call},\ \rho,\ \sigma)) \defas&\ (\var{lam},\ \rho) 
+\end{align*}
+
+
+The transition relation $(\cTo) : \Sigma \rightharpoonup \Sigma$ yields at most one successor for a given predecessor in the state-space $\Sigma$.
+%
+This is defined:
+%
+\begin{align*} 
+  \overbrace{(\ttlp \var{ae}_f\ \var{ae}_1\ \ldots\ \var{ae}_j \ttrp, \rho, \sigma)}^{\varsigma} 
+  \cTo 
+  (\var{call}', \rho', \sigma')
+\end{align*}
+\vspace{-0.5cm}
+\begin{align*}
+  \textrm{where} \ \ \ \ \ \ & (\lamform{x_0 \ldots x_j}{\var{call}'}, \rho_\lambda) = \mathcal{A}(\var{ae}_f,\ \varsigma) 
+  \\
+  & v_i = \mathcal{A}(\var{ae}_i,\ \varsigma)  
+  \\
+  & \rho' = \rho_\lambda [ x_i \mapsto a_i ]
+  \\
+  & \sigma' = \sigma [ a_i \mapsto v_i ]
+  \\
+  & a_i = (x_i, \vert \var{dom}(\sigma) \vert)
+\end{align*}
+%
+Execution steps to the call-site body of the lambda invoked (as given by the atomic-evaluation of $\var{ae}_f$).
+%
+This closure's environment $(\rho_\lambda)$ is extended with a binding for each variable $x_i$ to a fresh address $a_i$.
+%
+A particular strategy for allocating a fresh address is to pair the variable being allocated for with the current number of points in the store (a value that increases after each set of new allocations).
+%
+The store is extended with the atomic evaluation of $\var{ae}_i$ for each of these addresses $a_i$.
+%
+A state becomes stuck if \texttt{(halt)} is reached or if the program is malformed (\textit{e.g.}, a free variable is encountered).
+
+
+To fully evaluate a program $\var{call}_0$ using these transition rules, we \textit{inject} it into our state space using a helper 
+$\mathcal{I} : \syn{Call} \to \Sigma$:
+%
+\begin{align*}
+  \mathcal{I}(\var{call}) \defas (\var{call}, \varnothing, \varnothing)
+\end{align*}
+
+
+We may now perform the standard lifting of $(\cTo)$ to a collecting semantics defined over sets of states:
+%
+\begin{align*}
+  s \in S \defas \mathcal{P}(\Sigma)
+\end{align*}
+%
+Our collecting relation $(\cToW)$ is a monotonic, total function that gives a set including the trivially reachable state $\mathcal{I}(\var{call}_0)$
+plus the set of all states immediately succeeding those in its input.
+%
+\begin{align*}
+  s \cToW \Set{ \varsigma'\ \vert\ \varsigma \in s \wedge \varsigma \cTo \varsigma' } \cup \Set{ \mathcal{I}(\var{call}_0) }
+\end{align*}
+
+
+If the program $\var{call}_0$ terminates, iteration of $(\cToW)$ from $\bot$ (i.e., the empty set $\varnothing$) does as well.
+%
+That is, ${(\cToW)}^{n}(\bot)$ is a fixed point containing $\var{call}_0$'s full program trace for some $n \in \mathbb{N}$ whenever $\var{call}_0$ is a terminating program.
+%
+No such $n$ is guaranteed to exist in the general case (when $\var{call}_0$ is a non-terminating program)
+as our language (the untyped CPS $\lambda$-calculus) is Turing-equivalent, our semantics is fully precise, and the state-space we defined is infinite.
+
+
+\subsection{An Abstract Operational Semantics}
+\label{sec:aam:abstract}
+%
+Now that we have formalized program evaluation using our concrete semantics as iteration to a (possibly infinite) fixed point, we are ready to design a 
+computable approximation of this fixed point (the exact program trace) using abstract interpretation.
+%
+Previous work has explored a wide variety of approaches to systematically abstracting a semantics like these 
+\cite{might:2010:aam,johnson:2013:oaam,might:2010:free}.
+%%%% ^^ more references here ^^
+%
+Broadly construed, the nature of these changes is to simultaneously finitize the domains of our machine while introducing non-determinism both into the 
+transition relation (multiple successor states may immediately follow a predecessor state) and the store (multiple values may become conflated at a single address).
+%
+We use a finite address space to cut the otherwise mutually recursive structure of values (closures) and environments.
+%
+(Without addresses and a value store, environments map variables directly to closures and closures contain environments). 
+% 
+A finite address space yields a finite state space overall and ensures the computability of our analysis.
+%
+Typographically, components unique to this \textit{abstract} abstract machine wear hats so we can tell them apart without confusing essential underlying roles:
+%
+\begin{align*}
+  \hat{\varsigma} \in \hat{\Sigma} \defas&\ \mathsf{Call} \times \widehat{\var{Env}} \times \widehat{\var{Store}}
+  \\
+  \hat{\rho} \in \widehat{\var{Env}} \defas&\ \mathsf{\var{Var}} \rightharpoonup \widehat{\var{Addr}}  
+  \\
+  \hat{\sigma} \in \widehat{\var{Store}} \defas&\ \widehat{\var{Addr}} \rightarrow \widehat{\var{Value}}  
+  \\
+  \hat{a} \in \widehat{\var{Addr}} \defas&\ \mathsf{Var}
+  \\
+  \hat{v} \in \widehat{\var{Value}} \defas&\ \mathcal{P}(\widehat{\var{Clo}})  
+  \\
+  \widehat{\var{clo}} \in \widehat{\var{Clo}} \defas&\ \mathsf{Lam} \times \widehat{\var{Env}} 
+\end{align*}
+%
+Value stores are now total functions mapping abstract addresses to a \textit{flow set} ($\hat{v}$) of zero or more abstract closures. 
+%
+This allows a range of values to merge and inhabit a single abstract address, introducing imprecision into our abstract semantics, but also allowing
+for a finite state space and a guarantee of computability.
+%
+To begin, we use a monovariant address set $\widehat{\var{Addr}}$ with a single address for each syntactic variable.
+%
+This choice (and its alternatives) is at the heart of our present topic and will be returned to shortly.
+
+
+
+Evaluation of atomic expressions is handled by an auxiliary function $(\hat{\mathcal{A}})$ which produces a flow set $(\hat{v})$
+for an atomic expression in the context of an abstract state $(\hat{\varsigma})$.
+%
+In the case of closure creation, a singleton flow set is produced.
+%
+\begin{align*}
+  \hat{\mathcal{A}} : \mathsf{AE} \times \hat{\Sigma} \rightharpoonup&\ \widehat{\var{Value}} 
+  \\
+  \hat{\mathcal{A}}(x,\ (\var{call},\ \hat{\rho},\ \hat{\sigma})) \defas&\ \hat{\sigma}(\hat{\rho}(x)) 
+  \\
+  \hat{\mathcal{A}}(\var{lam},\ (\var{call},\ \hat{\rho},\ \hat{\sigma})) \defas&\ \Set{(\var{lam},\ \hat{\rho})} 
+\end{align*}
+
+
+The abstract transition relation $(\pdTo) \subseteq \hat{\Sigma} \times \hat{\Sigma}$ yields any number of successors for a given predecessor in the state-space $\hat{\Sigma}$.
+%
+As mentioned when introducing AAM, there are two fundamental changes required using this approach. 
+%
+Because abstract addresses can become bound to multiple closures in the store and atomic evaluation produces a flow set containing zero or more closures, one successor state
+results for each closure bound to the address for $\var{ae}_f$.
+%
+Also, due to the relationality of abstract stores, we can no longer use strong update when extending the store $\hat{\sigma}'$.
+%
+\begin{align*} 
+  \overbrace{(\sexpr{\var{ae}_f\ \var{ae}_1\ \ldots\ \var{ae}_j}, \hat{\rho}, \hat{\sigma})}^{\hat{\varsigma}} 
+  \pdTo 
+  (\var{call}', \hat{\rho}', \hat{\sigma}')
+\end{align*}
+\vspace{-0.5cm}
+\begin{align*}
+  \textrm{where} \ \ \ \ \ \ & (\lamform{x_0 \ldots x_j}{\var{call}'}, \hat{\rho}_\lambda) \in \hat{\mathcal{A}}(\var{ae}_f,\ \hat{\varsigma}) 
+  \\
+  & \hat{v}_i = \hat{\mathcal{A}}(\var{ae}_i,\ \hat{\varsigma})  
+  \\
+  & \hat{\rho}' = \hat{\rho}_\lambda [ x_i \mapsto \hat{a}_i ]
+  \\
+  & \hat{\sigma}' = \hat{\sigma} \sqcup [ \hat{a}_i \mapsto \hat{v}_i ]
+  \\
+  & \hat{a}_i = x_i
+\end{align*}
+%
+A weak update is performed on the store instead which results in the least upper bound of the existing store and each new binding.
+%
+Join on abstract stores distributes point-wise:
+%
+\begin{align*}
+  \hat{\sigma} \sqcup \hat{\sigma}' &\defas \lambda \hat{a}.\ \hat{\sigma}(\hat{a}) \cup \hat{\sigma}'(\hat{a})
+\end{align*}
+%
+Unless it is desirable, and provably safe to do so \cite{might:2006:gammacfa}, we never remove closures already seen.
+%
+Instead, we strictly accumulate every closure bound to each $\hat{a}$ (i.e., abstract closures which simulate closures bound to addresses which $\hat{a}$ simulates)
+over the lifetime of the program.
+%
+A flow set for an address $\hat{a}$ indicates a range of values which over-approximates all possible concrete values that can flow to any 
+concrete address approximated by $\hat{a}$.
+%
+For example, if a concrete machine binds $(y, 345) \mapsto \var{clo}_1$ and $(y, 903) \mapsto \var{clo}_2$, 
+its monovariant approximation might bind $y \mapsto \{ \widehat{\var{clo}}_1, \widehat{\var{clo}}_2 \}$.
+%
+Precision is lost for $(y, 345)$ both because its value has been merged with $\widehat{clo}_2$, and because the environments for $\widehat{clo}_1$ and 
+$\widehat{clo}_2$ in-turn generalize over many possible addresses for their free variables (the environment in $\widehat{\var{clo}}_1$ is less precise than that in $\var{clo}_1$).
+
+
+To approximately evaluate a program according to these abstract semantics, we first define an abstract injection function,
+$\hat{\mathcal{I}}$, where the store begins as a function, $\bot$, that maps every abstract address to the empty set.
+%
+\begin{align*}
+ \hat{\mathcal{I}} :&\ \syn{Call} \to \hat{\Sigma}
+ \\
+ \hat{\mathcal{I}}(\var{call}) \defas&\ (\var{call}, \varnothing, \bot)
+\end{align*}
+
+
+We again lift $(\pdTo)$ to obtain a collecting semantics $(\pdToS)$ defined over sets of states:
+%
+\begin{align*}
+  \hat{s} \in \hat{S} &\defas \Pow{\hat{\Sigma}}
+\end{align*}
+%
+Our collecting relation $(\pdToS)$ is a monotonic, total function that gives a set including the trivially reachable finite-state $\hat{\mathcal{I}}(\var{call}_0)$
+plus the set of all states immediately succeeding those in its input. 
+%
+\begin{align*}
+  \hat{s} \pdToS \hat{s}', \text{where}
+\end{align*}
+\vspace{-0.6cm}
+\begin{align*}
+  %\text{where}\ \ \ \ \ \ 
+  \hat{s}' = \Set{ \hat{\varsigma}'\ \vert\ \hat{\varsigma} \in \hat{s} \wedge \hat{\varsigma} \pdTo \hat{\varsigma}' } \cup \Set{ \hat{\mathcal{I}}(\var{call}_0) }
+\end{align*}
+%
+Because $\widehat{Addr}$ (and thus $\hat{\Sigma}$) is now finite, we know the approximate evaluation of even a non-terminating $\var{call}_0$ will terminate.
+%
+That is, for some $n \in \mathbb{N}$, the value $(\pdToS)^{n}(\bot)$ is guaranteed to be a fixed point containing an approximation of $\var{call}_0$'s full concrete program trace
+\cite{tarski:1955:fixpoint}.
+
+
+
+\subsubsection{Widening and Extension to Larger Languages}
+\label{sec:aam:extension}
+%
+Various forms of widening and further approximations may be layered on top of the na\"ive analysis ($\pdToS$).
+%
+One such approximation is store widening, which is necessary for our analysis to be polynomial-time in the size of the program.
+%
+This structurally approximates the analysis above, where each state contains a whole store, by pairing a set of states without stores, with a single, global store that overapproximates all possible bindings.
+%
+This global store is maintained as the least-upper-bound of all bindings that are encountered in the course of analysis.
+
+
+
+Setting up a semantics for real language features such as conditionals, primitive operations, direct-style recursion, 
+or exceptions, is no more difficult, if more verbose.
+%
+Supporting direct-style recursion, for example, requires an explicit stack as continuations are no longer baked into the 
+source text by CPS conversion.
+%
+Handling other forms is often as straightforward as including an additional transition rule for each.
+%
+
