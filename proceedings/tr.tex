@@ -1,4 +1,4 @@
-\documentclass[oneside]{book}
+\documentclass[a4paper]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[hidelinks]{hyperref}
 \usepackage{pdfpages}
@@ -10,52 +10,17 @@
 \usepackage{baskervald}
 \usepackage{geometry}
 \usepackage{multicol}
-\definecolor{neured}{cmyk}{0.0,1.0,0.9,0.05}
-\definecolor{neugrey}{cmyk}{0.0,0.13,0.30,0.76}
 \fancyhead{}
-\lfoot{\thepage}
+\fancyfoot[LE,RO]{\thepage}
 \cfoot{}
-\rfoot{Scheme and Functional Programming Workshop 2017}
+\fancyfoot[LO,RE]{Scheme and Functional Programming Workshop 2017}
 \renewcommand{\headrulewidth}{0.0pt}
 \date{September 3rd, 2017}
 \author{Nada Amin \and Fran\c{c}ois-Ren\'e Rideau}
 \begin{document}
 \frontmatter
-\begin{titlepage}
-\newgeometry{textheight=9.5in,textwidth=506pt}
-\thispagestyle{empty}
-\hspace{-15pt}%
-\colorbox{neured}{%
-\begin{minipage}[t][130pt][t]{0.99\textwidth}%
-\hspace{30pt}%
-\begin{minipage}[t][130pt][t]{0.16\textwidth}%
-\vspace{\fill}%
-%\includegraphics[height=72pt]{seal}%
-\vspace{\fill}%
-\end{minipage}%
-\begin{minipage}[t][130pt][t]{0.70\textwidth}%
-\vspace{\fill}%
-\color{white}{\Huge{\textbf{University of Cambridge, UK}}}\\
-\color{white}{\large{\textbf{Department of Computer Science and Technology}}}%
-\vspace{30pt}%
-\end{minipage}%
-\end{minipage}}
-\vspace{30pt}
-\begin{flushright}
-\Huge{Proceedings of the 2017 Scheme and\\ Functional Programming Workshop}\\
-\vspace{20pt}
-\large{Oxford, UK---September 3rd, 2017}\\
-\vspace{20pt}
-\large{Edited by Nada Amin, University of Cambridge\\ and Fran\c{c}ois-Ren\'e Rideau, Metaphor}
-\end{flushright}
-\vspace{\fill}
-\colorbox{neugrey}{%
-\begin{minipage}[t][24pt][t]{0.99\textwidth}
-\hspace{30pt}
-\end{minipage}}
-\end{titlepage}
-\restoregeometry
-\newgeometry{textheight=8.5in,textwidth=490pt}
+\setcounter{page}{3}  % pages 1+2 to be added by TR editor
+\newgeometry{textheight=8.5in,hmargin=20mm}
 \chapter*{Preface}
 This report aggregates the papers presented at the eigtheenth annual Scheme and
 Functional Programming Workshop, hosted on September 3rd, 2017 in Oxford,
@@ -113,27 +78,27 @@ Will Byrd, University of Alabama at Birmingham\\
 \end{multicols}
 \tableofcontents
 \mainmatter
-\newgeometry{textheight=9.5in,textwidth=506pt}
+\newgeometry{textheight=9.5in,hmargin=20mm}
 
-\includepdf[pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,1,{Paper: Scalar and Tensor Parameters for Importing Tensor Index Notation ...},egi}]{paper-egi}
-
-\ \\
-\pagebreak
-
-\includepdf[pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,2,{Talk:\ \ \ Extending the LISP model from cons cells to triples, from trees to hypergraphs},arxana}]{talk-arxana}
+\includepdf[noautoscale,scale=1.07,pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,1,{Paper: Scalar and Tensor Parameters for Importing Tensor Index Notation ...},egi}]{paper-egi}
 
 \ \\
 \pagebreak
 
-\includepdf[pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,3,{Paper: Toward Parallelizing Control-flow Analysis with Datalog},gilray}]{paper-gilray}
+\includepdf[noautoscale,scale=1.07,pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,2,{Talk:\ \ \ Extending the LISP model from cons cells to triples, from trees to hypergraphs},arxana}]{talk-arxana}
 
 \ \\
 \pagebreak
 
-\includepdf[pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,4,{Talk:\ \ \ Gerbil on Gambit, as they say Racket on Chez},gerbil}]{talk-gerbil}
+\includepdf[noautoscale,scale=1.07,pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,3,{Paper: Toward Parallelizing Control-flow Analysis with Datalog},gilray}]{paper-gilray}
 
 \ \\
 \pagebreak
 
-\includepdf[pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,5,{Talk:\ \ \ \{lambda talk\}},lambdatalk}]{talk-lambdatalk}
+\includepdf[noautoscale,scale=1.07,pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,4,{Talk:\ \ \ Gerbil on Gambit, as they say Racket on Chez},gerbil}]{talk-gerbil}
+
+\ \\
+\pagebreak
+
+\includepdf[noautoscale,scale=0.98,pages=-,pagecommand={\thispagestyle{fancy}},addtotoc={1,chapter,5,{Talk:\ \ \ \{lambda talk\}},lambdatalk}]{talk-lambdatalk}
 \end{document}
